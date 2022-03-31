@@ -43,13 +43,19 @@ public class PicrossController implements Initializable {
         PicrossPuzzle puzzleNum = puzzlePool.getRandomPuzzle();
 
         if (puzzlePool.CheckAlert()) {
+            alert.setTitle("Data Set Value Error");
+            alert.setHeaderText("One of the numbers in a file has a different number than expected (0 or 1)");
             alert.showAndWait();
         }
 
-        //System.out.println(puzzlePool.getRandomPuzzle());
-       // System.out.println(puzzlePool.PicrossPuzzlePool(puzzleNum));
+        if (puzzlePool.CheckFormatAlert()) {
+            alert.setTitle("Invalid Data Size Error");
+            alert.setHeaderText("One of the data files has a size too many numbers in its file (total should be 25)");
+            alert.showAndWait();
+        }
 
-        //PicrossPuzzle puzzle1 = new PicrossPuzzle();
+
+
         String[] rowClues = puzzlePool.PicrossPuzzlePool(puzzleNum).getRowClues();
         String[] colClues = puzzlePool.PicrossPuzzlePool(puzzleNum).getColumnClues();
         //System.out.println();

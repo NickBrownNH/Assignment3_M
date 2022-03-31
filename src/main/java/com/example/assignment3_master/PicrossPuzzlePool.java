@@ -11,6 +11,8 @@ import java.util.Scanner;
 public class PicrossPuzzlePool {
 
     boolean hasAlert = false;
+    boolean hasFormatAlert = false;
+    int hasNextCounter = 0;
 
     private PicrossPuzzle[] getFiles () {
 
@@ -19,7 +21,6 @@ public class PicrossPuzzlePool {
         File aFile;
         int fileCount = 0;
         int[][] array2D;
-        int[][] secondArray2D;
 
         //dump all the file contents of the path into the local File array
         //all files and folders in the Data folder are collected
@@ -48,37 +49,6 @@ public class PicrossPuzzlePool {
         return puzzlePool;
     }
 
-
-    /**
-     * Reads one file and store the contents into a 5x5 int array
-     * File content is expected to be integers
-     * @param file the file to be read
-     * @return the 5x5 int array read from the file
-     */
-    private int[][] readFileForGetter(File file)
-    {
-        int[][] data = new int[5][5];
-
-        try {
-            Scanner readFrom = new Scanner(file);
-
-            //read the 9 numbers from the file and store them into the 2D int array, data
-                for (int i = 0; i < 5; i++)
-                    for (int j = 0; j < 5; j++) {
-                            data[i][j] = readFrom.nextInt();
-                        //data array is now filled, this may be used to instantiate a PicrossPuzzle object, but change to 5x5
-                    }
-                readFrom.close();
-
-
-        } catch (IOException ex) {
-
-        }
-        finally {
-            return data;
-        }
-    }
-
     /**
      * Reads one file and store the contents into a 5x5 int array
      * File content is expected to be integers
@@ -103,11 +73,31 @@ public class PicrossPuzzlePool {
                     try {
                         data[i][j] = readFrom.nextInt();
 
-                        if (data[i][j] == 0 || data[i][j] == 1) {
-                        } else {
+
+                        if (readFrom.hasNextInt() == true) {
+                            hasNextCounter++;
+                            System.out.println(hasNextCounter);
+                        } else if (hasNextCounter != 24) {
+                            throw new IncorrectFormatException("File: " + file + " has an incorrect size (25 numbers expected)");
+                        }
+
+                        if (hasNextCounter > 24 && readFrom.hasNextInt() == true) {
+                            throw new IncorrectFormatException("File: " + file + " has an incorrect size (25 numbers expected)");
+                        }
+
+                        if (data[i][j] != 0 && data[i][j] != 1) {
                             throw new IncorrectNumberException("One of the numbers in this file have a different number than expected (0 or 1) in this file" + file);
                         }
 
+                    } catch(IncorrectFormatException ex) {
+                        System.err.println("File: " + file + " has an incorrect size (25 numbers expected)");
+                        hasFormatAlert = true;
+                        i = 0;
+                        j = 0;
+                        hasNextCounter = 1;
+                        readFrom.close();
+                        readFrom = new Scanner(files[1]);
+                        data[i][j] = readFrom.nextInt();
                     } catch(IncorrectNumberException ex) {
                         System.err.println("One of the numbers in this file have a different number than expected (0 or 1) in this file" + file);
                         hasAlert = true;
@@ -133,6 +123,7 @@ public class PicrossPuzzlePool {
 //                    System.out.print(data[i][j] + " ");
 //                System.out.println();
 //            }
+            hasNextCounter = 0;
             return data;
         }
     }
@@ -159,6 +150,10 @@ public class PicrossPuzzlePool {
 
     boolean CheckAlert() {
         return hasAlert;
+    }
+
+    boolean CheckFormatAlert() {
+        return hasFormatAlert;
     }
 
 }
