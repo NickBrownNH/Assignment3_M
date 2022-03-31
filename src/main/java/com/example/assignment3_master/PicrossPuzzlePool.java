@@ -10,6 +10,8 @@ import java.util.Scanner;
 
 public class PicrossPuzzlePool {
 
+    boolean hasAlert = false;
+
     private PicrossPuzzle[] getFiles () {
 
         Path path = Paths.get(".\\Data");
@@ -17,6 +19,7 @@ public class PicrossPuzzlePool {
         File aFile;
         int fileCount = 0;
         int[][] array2D;
+        int[][] secondArray2D;
 
         //dump all the file contents of the path into the local File array
         //all files and folders in the Data folder are collected
@@ -41,6 +44,7 @@ public class PicrossPuzzlePool {
                 }
             }
         }
+
         return puzzlePool;
     }
 
@@ -51,7 +55,7 @@ public class PicrossPuzzlePool {
      * @param file the file to be read
      * @return the 5x5 int array read from the file
      */
-    private int[][] readFile(File file)
+    private int[][] readFileForGetter(File file)
     {
         int[][] data = new int[5][5];
 
@@ -59,32 +63,90 @@ public class PicrossPuzzlePool {
             Scanner readFrom = new Scanner(file);
 
             //read the 9 numbers from the file and store them into the 2D int array, data
-            for (int i=0; i<5; i++)
-                for (int j=0; j<5; j++)
-                    data[i][j] = readFrom.nextInt();
-            //data array is now filled, this may be used to instantiate a PicrossPuzzle object, but change to 5x5
+                for (int i = 0; i < 5; i++)
+                    for (int j = 0; j < 5; j++) {
+                            data[i][j] = readFrom.nextInt();
+                        //data array is now filled, this may be used to instantiate a PicrossPuzzle object, but change to 5x5
+                    }
+                readFrom.close();
 
-            readFrom.close();
+
+        } catch (IOException ex) {
+
         }
-        catch (IOException ex) {
-            System.out.println(ex);
+        finally {
+            return data;
+        }
+    }
+
+    /**
+     * Reads one file and store the contents into a 5x5 int array
+     * File content is expected to be integers
+     * @param file the file to be read
+     * @return the 5x5 int array read from the file
+     */
+    private int[][] readFile(File file)
+    {
+        int[][] data = new int[5][5];
+        Path path = Paths.get(".\\Data");
+        File[] files;
+        File aFile;
+        aFile = new File(path.toString());
+        files = aFile.listFiles();
+
+        try {
+            Scanner readFrom = new Scanner(file);
+
+            //read the 9 numbers from the file and store them into the 2D int array, data
+            for (int i = 0; i < 5; i++)
+                for (int j = 0; j < 5; j++) {
+                    try {
+                        data[i][j] = readFrom.nextInt();
+
+                        if (data[i][j] == 0 || data[i][j] == 1) {
+                        } else {
+                            throw new IncorrectNumberException("One of the numbers in this file have a different number than expected (0 or 1) in this file" + file);
+                        }
+
+                    } catch(IncorrectNumberException ex) {
+                        System.err.println("One of the numbers in this file have a different number than expected (0 or 1) in this file" + file);
+                        hasAlert = true;
+                        i = 0;
+                        j = 0;
+                        readFrom.close();
+                        readFrom = new Scanner(files[1]);
+                        data[i][j] = readFrom.nextInt();
+                    }
+                    //data array is now filled, this may be used to instantiate a PicrossPuzzle object, but change to 5x5
+
+                }
+            readFrom.close();
+
+
+        } catch (IOException ex) {
+
         }
         finally {
             //print contents of array to System.out to verify that data was read
-            for (int i=0; i<5; i++) {
-                for (int j = 0; j < 5; j++)
-                    System.out.print(data[i][j] + " ");
-                System.out.println();
-            }
+//            for (int i=0; i<5; i++) {
+//                for (int j = 0; j < 5; j++)
+//                    System.out.print(data[i][j] + " ");
+//                System.out.println();
+//            }
             return data;
         }
     }
 
 
     public PicrossPuzzle getRandomPuzzle(){
-        int randomNum = (int)(Math.random()*getFiles().length);
-        System.out.println("-----------------------||------------------" + randomNum);
-        return getFiles()[randomNum];
+        Path path = Paths.get(".\\Data");
+        File[] files;
+        File aFile;
+        aFile = new File(path.toString());
+        files = aFile.listFiles();
+
+        int randomNum = (int)(Math.random()* files.length);
+        return PicrossPuzzlePool(randomNum);
     }
 
     PicrossPuzzle PicrossPuzzlePool (int puzzleNum) {
@@ -93,6 +155,10 @@ public class PicrossPuzzlePool {
 
     PicrossPuzzle PicrossPuzzlePool (PicrossPuzzle puzzle) {
         return puzzle;
+    }
+
+    boolean CheckAlert() {
+        return hasAlert;
     }
 
 }

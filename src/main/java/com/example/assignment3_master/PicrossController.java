@@ -1,10 +1,10 @@
 package com.example.assignment3_master;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -20,6 +20,7 @@ public class PicrossController implements Initializable {
 
     final String ON_COLOR = "-fx-background-color: black";
     final String OFF_COLOR = "-fx-background-color: white";
+    public Alert alert = new Alert(Alert.AlertType.ERROR);
 
     @FXML
     /**
@@ -34,18 +35,25 @@ public class PicrossController implements Initializable {
      * Selects a puzzle and shows the solution
      */
     protected void showSolution() {
+
+
+
         PicrossPuzzlePool puzzlePool = new PicrossPuzzlePool();
 
         PicrossPuzzle puzzleNum = puzzlePool.getRandomPuzzle();
 
-        System.out.println(puzzlePool.getRandomPuzzle());
-        System.out.println(puzzlePool.PicrossPuzzlePool(puzzleNum));
+        if (puzzlePool.CheckAlert()) {
+            alert.showAndWait();
+        }
 
-        PicrossPuzzle puzzle1 = new PicrossPuzzle();
+        //System.out.println(puzzlePool.getRandomPuzzle());
+       // System.out.println(puzzlePool.PicrossPuzzlePool(puzzleNum));
+
+        //PicrossPuzzle puzzle1 = new PicrossPuzzle();
         String[] rowClues = puzzlePool.PicrossPuzzlePool(puzzleNum).getRowClues();
         String[] colClues = puzzlePool.PicrossPuzzlePool(puzzleNum).getColumnClues();
-        System.out.println();
-        System.out.println(puzzlePool.PicrossPuzzlePool(puzzleNum));
+        //System.out.println();
+       // System.out.println(puzzlePool.PicrossPuzzlePool(puzzleNum));
 
         //Prints the puzzle's solution to standard output for debugging purposes
         System.out.println("ROW CLUES: ");
@@ -97,6 +105,7 @@ public class PicrossController implements Initializable {
         setButton(B23, puzzlePool.PicrossPuzzlePool(puzzleNum).getValue(4, 2));
         setButton(B24, puzzlePool.PicrossPuzzlePool(puzzleNum).getValue(4, 3));
         setButton(B25, puzzlePool.PicrossPuzzlePool(puzzleNum).getValue(4, 4));
+
     }
 
     /**
@@ -107,6 +116,9 @@ public class PicrossController implements Initializable {
     public void setButton (Button b, int value) {
         b.setStyle(value==0 ? OFF_COLOR : ON_COLOR);
     }
+
+
+
 
     @Override
     /**
